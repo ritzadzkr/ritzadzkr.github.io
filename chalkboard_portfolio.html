@@ -1,0 +1,406 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Patrick+Hand&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --board:#1a2a1a;
+  --board-mid:#1e321e;
+  --board-light:#243a24;
+  --chalk:#f0ede4;
+  --chalk-dim:rgba(240,237,228,0.55);
+  --chalk-faint:rgba(240,237,228,0.2);
+  --frame:#3d2b1f;
+  --frame-light:#5c4033;
+  --ch-pink:#ff8fab;
+  --ch-blue:#7ec8e3;
+  --ch-yellow:#ffe066;
+  --ch-green:#7dde92;
+  --ch-orange:#ffb347;
+  --ch-purple:#c9b1ff;
+  --ch-red:#ff6b6b;
+  --ch-teal:#5ce1e6;
+}
+body{background:var(--board);font-family:'Caveat',cursive;color:var(--chalk)}
+
+.frame{background:var(--frame);padding:10px;border-radius:4px}
+.frame-inner{background:var(--board);border:2px solid var(--frame-light);border-radius:2px;overflow:hidden}
+
+.header{background:var(--board-mid);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--chalk-faint)}
+.logo{font-size:26px;font-weight:700;color:var(--chalk);letter-spacing:0.5px}
+.logo em{color:var(--ch-yellow);font-style:normal}
+.nav{display:flex;gap:1rem}
+.nav button{background:none;border:none;font-family:'Caveat',cursive;font-size:18px;color:var(--chalk-dim);cursor:pointer;padding:4px 10px;border-radius:2px;transition:all 0.2s;border-bottom:2px solid transparent}
+.nav button:hover,.nav button.active{color:var(--chalk);border-bottom-color:var(--ch-yellow)}
+
+.hero{padding:1.5rem 1.5rem 0.75rem;border-bottom:1px dashed var(--chalk-faint)}
+.hero h1{font-size:38px;font-weight:700;line-height:1.15;margin-bottom:0.4rem}
+.hero p{font-size:15px;color:var(--chalk-dim);font-family:'Patrick Hand',cursive;line-height:1.7;max-width:500px}
+
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--chalk-faint);padding:0 1.5rem;background:var(--board-mid)}
+.tab{font-family:'Caveat',cursive;font-size:18px;padding:0.6rem 1rem;cursor:pointer;color:var(--chalk-dim);border-bottom:2.5px solid transparent;margin-bottom:-1px;background:none;border-top:none;border-left:none;border-right:none;transition:all 0.2s}
+.tab.active{color:var(--chalk);border-bottom-color:var(--ch-pink)}
+.tab:hover{color:var(--chalk)}
+
+.section{padding:1.5rem;display:none}
+.section.active{display:block}
+
+.sec-title{font-size:22px;font-weight:700;color:var(--ch-yellow);margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:1px dashed var(--chalk-faint);display:flex;align-items:center;gap:8px}
+
+.upload-zone{border:2px dashed var(--chalk-faint);border-radius:4px;padding:1.5rem;text-align:center;cursor:pointer;transition:border-color 0.2s;background:var(--board-mid);margin-bottom:1.25rem;position:relative}
+.upload-zone:hover{border-color:var(--ch-yellow)}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-zone .uz-label{font-size:18px;color:var(--chalk-dim);margin-top:6px}
+.upload-zone small{font-size:13px;color:var(--chalk-faint);font-family:'Patrick Hand',cursive;display:block;margin-top:4px}
+
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem}
+.pill{font-family:'Caveat',cursive;font-size:15px;padding:3px 14px;border-radius:20px;border:1.5px solid var(--chalk-faint);background:transparent;color:var(--chalk-dim);cursor:pointer;transition:all 0.2s}
+.pill:hover{border-color:var(--chalk-dim);color:var(--chalk)}
+.pill.active{border-color:var(--ch-yellow);color:var(--ch-yellow)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:1rem}
+
+.card{background:var(--board-mid);border:1.5px solid var(--chalk-faint);border-radius:3px;overflow:hidden;cursor:pointer;transition:transform 0.2s,border-color 0.2s;position:relative}
+.card:hover{transform:translateY(-3px);border-color:var(--chalk-dim)}
+.card img{width:100%;aspect-ratio:1;object-fit:cover;display:block;filter:sepia(10%) brightness(0.92)}
+.card-body{padding:8px 10px 10px}
+.card-title{font-size:16px;font-weight:700;color:var(--chalk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;outline:none}
+.card-title[contenteditable="true"]:focus{background:var(--board-light);border-radius:2px;white-space:normal;overflow:visible}
+.card-desc{font-family:'Patrick Hand',cursive;font-size:12px;color:var(--chalk-dim);line-height:1.5;min-height:32px;outline:none;word-break:break-word}
+.card-desc[contenteditable="true"]:focus{background:var(--board-light);border-radius:2px}
+.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:6px;gap:4px}
+.chalk-dot{width:16px;height:16px;border-radius:50%;border:none;cursor:pointer;transition:transform 0.15s;flex-shrink:0}
+.chalk-dot:hover,.chalk-dot.active{transform:scale(1.4);outline:2px solid var(--chalk)}
+.tag-badge{font-size:12px;padding:1px 8px;border-radius:12px;border:none;background:transparent;color:inherit;font-family:'Caveat',cursive;cursor:pointer}
+.card-del{background:none;border:none;color:var(--chalk-faint);cursor:pointer;font-size:14px;padding:2px;opacity:0;transition:opacity 0.2s}
+.card:hover .card-del{opacity:1}
+.card-del:hover{color:var(--ch-red)}
+
+.cat-sel{background:var(--board);border:1px solid var(--chalk-faint);color:var(--chalk-dim);font-family:'Caveat',cursive;font-size:13px;padding:2px 6px;border-radius:12px;cursor:pointer;outline:none;flex:1;max-width:90px;appearance:none;text-align:center}
+.cat-sel option{background:var(--board)}
+
+.edit-panel{background:var(--board-mid);border:1.5px solid var(--chalk-faint);border-radius:3px;padding:1rem;margin-top:0.75rem;display:none}
+.edit-panel.open{display:block}
+.ep-title{font-size:17px;color:var(--ch-blue);margin-bottom:0.75rem;font-weight:700}
+.ep-field{margin-bottom:0.75rem}
+.ep-field label{font-size:14px;color:var(--chalk-dim);display:block;margin-bottom:3px}
+.ep-field input,.ep-field textarea,.ep-field select{width:100%;background:var(--board);border:1px solid var(--chalk-faint);color:var(--chalk);font-family:'Patrick Hand',cursive;font-size:14px;padding:6px 10px;border-radius:2px;outline:none}
+.ep-field input:focus,.ep-field textarea:focus{border-color:var(--ch-yellow)}
+.ep-field textarea{min-height:70px;resize:vertical;line-height:1.6}
+.color-picker-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.cp-swatch{width:24px;height:24px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:transform 0.15s}
+.cp-swatch:hover,.cp-swatch.sel{transform:scale(1.3);border-color:var(--chalk)}
+.ep-btn{font-family:'Caveat',cursive;font-size:17px;background:none;border:1.5px solid var(--chalk-faint);color:var(--chalk-dim);padding:5px 18px;border-radius:2px;cursor:pointer;transition:all 0.2s;margin-right:8px}
+.ep-btn:hover{border-color:var(--ch-green);color:var(--ch-green)}
+.ep-btn.primary{border-color:var(--ch-yellow);color:var(--ch-yellow)}
+
+.about-wrap{display:grid;grid-template-columns:auto 1fr;gap:1.5rem;align-items:start;max-width:560px}
+.avatar{width:90px;height:90px;border-radius:50%;border:2px dashed var(--chalk-faint);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;flex-shrink:0}
+.avatar:hover{border-color:var(--ch-yellow)}
+.avatar input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.about-fields{}
+.af{margin-bottom:0.85rem}
+.af label{font-size:14px;color:var(--chalk-dim);display:block;margin-bottom:3px}
+.af input,.af textarea{width:100%;background:var(--board);border:1px solid var(--chalk-faint);color:var(--chalk);font-family:'Patrick Hand',cursive;font-size:14px;padding:6px 10px;border-radius:2px;outline:none}
+.af input:focus,.af textarea:focus{border-color:var(--ch-blue)}
+.af textarea{min-height:80px;resize:vertical;line-height:1.7}
+.chalk-btn{font-family:'Caveat',cursive;font-size:18px;background:none;border:1.5px solid var(--ch-green);color:var(--ch-green);padding:6px 22px;border-radius:2px;cursor:pointer;transition:opacity 0.2s}
+.chalk-btn:hover{opacity:0.75}
+.saved{font-size:15px;color:var(--ch-green);margin-left:12px;opacity:0;transition:opacity 0.4s;font-family:'Patrick Hand',cursive}
+
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.85rem;max-width:500px}
+.ci{background:var(--board-mid);border:1.5px solid var(--chalk-faint);border-radius:3px;padding:0.85rem}
+.ci label{font-size:15px;color:var(--chalk-dim);display:block;margin-bottom:4px}
+.ci input{width:100%;background:var(--board);border:1px solid var(--chalk-faint);color:var(--chalk);font-family:'Patrick Hand',cursive;font-size:14px;padding:5px 8px;border-radius:2px;outline:none}
+.ci input:focus{border-color:var(--ch-teal)}
+.ci-icon{font-size:20px;margin-bottom:4px}
+
+.lb-wrap{display:none;min-height:500px;background:rgba(10,20,10,0.97);align-items:center;justify-content:center;flex-direction:column;gap:1rem}
+.lb-wrap.open{display:flex}
+.lb-wrap img{max-width:95%;max-height:420px;border:3px solid var(--frame-light);border-radius:2px}
+.lb-meta{text-align:center}
+.lb-meta h3{font-size:22px;color:var(--chalk);margin-bottom:4px}
+.lb-meta p{font-family:'Patrick Hand',cursive;font-size:14px;color:var(--chalk-dim)}
+.lb-close-btn{font-family:'Caveat',cursive;font-size:17px;background:none;border:1.5px solid var(--chalk-faint);color:var(--chalk-dim);padding:5px 16px;border-radius:2px;cursor:pointer}
+.lb-close-btn:hover{color:var(--chalk);border-color:var(--chalk)}
+
+.chalk-colors{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.cc{width:20px;height:20px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:transform 0.15s}
+.cc:hover,.cc.sel{transform:scale(1.4);border-color:var(--chalk)}
+
+.empty-state{text-align:center;padding:2.5rem;color:var(--chalk-faint);font-size:20px;line-height:2.2}
+</style>
+
+<h2 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Chalkboard drawing portfolio — gallery with customizable work cards</h2>
+
+<div class="frame">
+<div class="frame-inner">
+
+<header class="header">
+  <div class="logo" id="logo-txt">my <em>chalk</em>board</div>
+  <nav class="nav">
+    <button class="active" onclick="showTab('gallery')">Gallery</button>
+    <button onclick="showTab('about')">About</button>
+    <button onclick="showTab('contact')">Contact</button>
+  </nav>
+</header>
+
+<div class="hero">
+  <h1 style="color:var(--chalk)">every drawing<br><span style="color:var(--ch-pink)">tells a story</span></h1>
+  <p>mixed styles, mixed mediums — a portfolio written in chalk</p>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('gallery')">Gallery</button>
+  <button class="tab" onclick="showTab('about')">About me</button>
+  <button class="tab" onclick="showTab('contact')">Contact</button>
+</div>
+
+<div class="section active" id="sec-gallery">
+  <div class="upload-zone" id="dropzone">
+    <input type="file" accept="image/*" multiple onchange="handleFiles(this.files)" />
+    <i class="ti ti-photo-plus" style="font-size:30px;color:var(--chalk-faint)" aria-hidden="true"></i>
+    <div class="uz-label">drop drawings here or click to upload</div>
+    <small>JPG, PNG, GIF, WEBP — multiple files ok</small>
+  </div>
+  <div class="filter-row" id="filter-row"></div>
+  <div class="sec-title" id="gallery-title">Works</div>
+  <div class="grid" id="gallery-grid"></div>
+  <div class="edit-panel" id="edit-panel">
+    <div class="ep-title"><i class="ti ti-edit" style="font-size:16px;vertical-align:-2px;margin-right:6px" aria-hidden="true"></i>Customise this work</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
+      <div class="ep-field"><label>Title</label><input id="ep-title" type="text" /></div>
+      <div class="ep-field"><label>Category</label>
+        <select id="ep-cat" style="background:var(--board);border:1px solid var(--chalk-faint);color:var(--chalk);font-family:'Patrick Hand',cursive;font-size:14px;padding:6px 10px;border-radius:2px;width:100%;outline:none">
+          <option value="character">character</option><option value="portrait">portrait</option><option value="concept">concept</option><option value="landscape">landscape</option><option value="abstract">abstract</option><option value="study">study</option><option value="other">other</option>
+        </select>
+      </div>
+    </div>
+    <div class="ep-field"><label>Description / notes</label><textarea id="ep-desc" placeholder="e.g. Drawn in 2024, inspired by..."></textarea></div>
+    <div class="ep-field"><label>Chalk accent colour</label>
+      <div class="color-picker-row" id="ep-colors"></div>
+    </div>
+    <div>
+      <button class="ep-btn primary" onclick="saveEdit()">Save changes</button>
+      <button class="ep-btn" onclick="closeEdit()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="sec-about">
+  <div class="sec-title">About me</div>
+  <div class="about-wrap">
+    <div class="avatar" id="av-wrap">
+      <input type="file" accept="image/*" onchange="handleAvatar(this)" />
+      <i class="ti ti-user-circle" style="font-size:40px;color:var(--chalk-faint)" aria-hidden="true" id="av-icon"></i>
+      <img id="av-img" style="display:none" />
+    </div>
+    <div class="about-fields">
+      <div class="af"><label>Your name</label><input id="abt-name" type="text" placeholder="e.g. Rina Putri" /></div>
+      <div class="af"><label>Tagline</label><input id="abt-tag" type="text" placeholder="illustrator · dreamer · coffee addict" /></div>
+      <div class="af"><label>Bio</label><textarea id="abt-bio" placeholder="Write a bit about yourself and your art..."></textarea></div>
+      <div class="af"><label>Styles / mediums</label><input id="abt-sty" type="text" placeholder="pencil, watercolor, digital, ink..." /></div>
+      <div style="display:flex;align-items:center">
+        <button class="chalk-btn" onclick="saveAbout()">Save</button>
+        <span class="saved" id="abt-saved">Saved ✓</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="sec-contact">
+  <div class="sec-title">Get in touch</div>
+  <p style="font-family:'Patrick Hand',cursive;font-size:15px;color:var(--chalk-dim);margin-bottom:1.25rem">Add your links so people can find your work</p>
+  <div class="contact-grid">
+    <div class="ci"><div class="ci-icon" style="color:var(--ch-pink)"><i class="ti ti-brand-instagram" aria-hidden="true"></i></div><label>Instagram</label><input id="c-ig" type="text" placeholder="@username" /></div>
+    <div class="ci"><div class="ci-icon" style="color:var(--ch-blue)"><i class="ti ti-mail" aria-hidden="true"></i></div><label>Email</label><input id="c-em" type="text" placeholder="you@example.com" /></div>
+    <div class="ci"><div class="ci-icon" style="color:var(--ch-teal)"><i class="ti ti-brand-twitter" aria-hidden="true"></i></div><label>Twitter / X</label><input id="c-tw" type="text" placeholder="@username" /></div>
+    <div class="ci"><div class="ci-icon" style="color:var(--ch-yellow)"><i class="ti ti-world" aria-hidden="true"></i></div><label>Website</label><input id="c-wb" type="text" placeholder="https://..." /></div>
+    <div class="ci"><div class="ci-icon" style="color:var(--ch-orange)"><i class="ti ti-brand-behance" aria-hidden="true"></i></div><label>Behance</label><input id="c-bh" type="text" placeholder="behance.net/you" /></div>
+    <div class="ci"><div class="ci-icon" style="color:var(--ch-purple)"><i class="ti ti-brand-pinterest" aria-hidden="true"></i></div><label>Pinterest</label><input id="c-pi" type="text" placeholder="pinterest.com/you" /></div>
+  </div>
+  <button class="chalk-btn" style="margin-top:1.25rem;border-color:var(--ch-teal);color:var(--ch-teal)" onclick="saveContact()">Save links</button>
+  <span class="saved" id="cnt-saved">Saved ✓</span>
+</div>
+
+</div>
+</div>
+
+<div class="lb-wrap" id="lb">
+  <img id="lb-img" src="" alt="" />
+  <div class="lb-meta"><h3 id="lb-title"></h3><p id="lb-desc"></p></div>
+  <button class="lb-close-btn" onclick="closeLb()"><i class="ti ti-x" style="font-size:14px;vertical-align:-1px" aria-hidden="true"></i> close</button>
+</div>
+
+<script>
+const CHALKS=[
+  {name:'pink',val:'#ff8fab'},{name:'blue',val:'#7ec8e3'},{name:'yellow',val:'#ffe066'},
+  {name:'green',val:'#7dde92'},{name:'orange',val:'#ffb347'},{name:'purple',val:'#c9b1ff'},
+  {name:'red',val:'#ff6b6b'},{name:'teal',val:'#5ce1e6'},{name:'white',val:'#f0ede4'}
+];
+const CATS=['character','portrait','concept','landscape','abstract','study','other'];
+
+let items=[];
+let activeFilter='all';
+let editId=null;
+let editColor=CHALKS[0].val;
+
+try{items=JSON.parse(localStorage.getItem('cb_items')||'[]')}catch(e){}
+
+function save(){try{localStorage.setItem('cb_items',JSON.stringify(items))}catch(e){}}
+
+function showTab(t){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab,.nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+t).classList.add('active');
+  document.querySelectorAll('.tab').forEach(b=>{if(b.textContent.toLowerCase().includes(t.split('-')[0]))b.classList.add('active')});
+  document.querySelectorAll('.nav button').forEach(b=>{if(b.textContent.toLowerCase().includes(t))b.classList.add('active')});
+  if(t!=='gallery')closeEdit();
+}
+
+function handleFiles(files){
+  Array.from(files).forEach(f=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      items.push({id:'i'+Date.now()+Math.random().toFixed(4),src:e.target.result,title:f.name.replace(/\.[^.]+$/,''),desc:'',cat:'other',color:CHALKS[Math.floor(Math.random()*CHALKS.length)].val});
+      save();render();
+    };
+    r.readAsDataURL(f);
+  });
+}
+
+function render(){
+  const filtered=activeFilter==='all'?items:items.filter(x=>x.cat===activeFilter);
+  document.getElementById('gallery-title').innerHTML='Works <span style="font-size:16px;color:var(--chalk-faint);font-weight:400">'+(filtered.length?'('+filtered.length+')':'')+'</span>';
+  const grid=document.getElementById('gallery-grid');
+  if(!items.length){grid.innerHTML='<div class="empty-state"><div style="font-size:40px;opacity:0.18;margin-bottom:8px">✏</div>Upload your first drawing to begin</div>';renderFilters();return;}
+  grid.innerHTML=filtered.map(it=>`
+    <div class="card" style="border-color:${it.color}44" data-id="${it.id}">
+      <img src="${it.src}" alt="${it.title}" onclick="openLb('${it.id}')" />
+      <div class="card-body">
+        <div class="card-title" style="color:${it.color}">${it.title||'Untitled'}</div>
+        <div class="card-desc">${it.desc||'<span style="color:var(--chalk-faint);font-size:12px">no description yet</span>'}</div>
+        <div class="card-footer">
+          <span style="font-family:\'Caveat\',cursive;font-size:12px;padding:2px 10px;border-radius:12px;border:1px solid ${it.color}55;color:${it.color};opacity:0.85">${it.cat}</span>
+          <div style="display:flex;gap:6px;align-items:center">
+            <button class="ep-btn" style="font-size:13px;padding:2px 10px;border-color:${it.color}66;color:${it.color};margin:0" onclick="openEdit('${it.id}')"><i class="ti ti-edit" style="font-size:13px;vertical-align:-1px" aria-hidden="true"></i> edit</button>
+            <button class="card-del" onclick="delItem('${it.id}')" title="Remove" aria-label="Remove"><i class="ti ti-trash" style="font-size:14px" aria-hidden="true"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  renderFilters();
+}
+
+function renderFilters(){
+  const cats=[...new Set(items.map(i=>i.cat))];
+  const row=document.getElementById('filter-row');
+  let html=`<span class="pill${activeFilter==='all'?' active':''}" style="${activeFilter==='all'?'border-color:var(--ch-yellow);color:var(--ch-yellow)':''}" onclick="filterBy('all',this)">All</span>`;
+  cats.forEach(c=>{
+    const active=activeFilter===c;
+    html+=`<span class="pill${active?' active':''}" style="${active?'border-color:var(--ch-yellow);color:var(--ch-yellow)':''}" onclick="filterBy('${c}',this)">${c}</span>`;
+  });
+  row.innerHTML=html;
+}
+
+function filterBy(cat){
+  activeFilter=cat;render();
+}
+
+function delItem(id){items=items.filter(x=>x.id!==id);if(editId===id)closeEdit();save();render();}
+
+function openEdit(id){
+  editId=id;
+  const it=items.find(x=>x.id===id);
+  if(!it)return;
+  document.getElementById('ep-title').value=it.title||'';
+  document.getElementById('ep-cat').value=it.cat||'other';
+  document.getElementById('ep-desc').value=it.desc||'';
+  editColor=it.color||CHALKS[0].val;
+  const row=document.getElementById('ep-colors');
+  row.innerHTML=CHALKS.map(c=>`<div class="cp-swatch${editColor===c.val?' sel':''}" style="background:${c.val}" title="${c.name}" onclick="pickColor('${c.val}',this)"></div>`).join('');
+  const panel=document.getElementById('edit-panel');
+  panel.classList.add('open');
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function pickColor(val,el){
+  editColor=val;
+  document.querySelectorAll('.cp-swatch').forEach(s=>s.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function saveEdit(){
+  const it=items.find(x=>x.id===editId);
+  if(!it)return;
+  it.title=document.getElementById('ep-title').value||'Untitled';
+  it.cat=document.getElementById('ep-cat').value;
+  it.desc=document.getElementById('ep-desc').value;
+  it.color=editColor;
+  save();render();closeEdit();
+}
+
+function closeEdit(){
+  document.getElementById('edit-panel').classList.remove('open');
+  editId=null;
+}
+
+function openLb(id){
+  const it=items.find(x=>x.id===id);
+  if(!it)return;
+  document.getElementById('lb-img').src=it.src;
+  document.getElementById('lb-title').textContent=it.title||'';
+  document.getElementById('lb-title').style.color=it.color||'var(--chalk)';
+  document.getElementById('lb-desc').textContent=it.desc||'';
+  document.getElementById('lb').classList.add('open');
+}
+function closeLb(){document.getElementById('lb').classList.remove('open');}
+
+function handleAvatar(input){
+  const r=new FileReader();
+  r.onload=e=>{
+    const img=document.getElementById('av-img');img.src=e.target.result;img.style.display='block';
+    document.getElementById('av-icon').style.display='none';
+    try{localStorage.setItem('cb_avatar',e.target.result)}catch(ex){}
+  };
+  r.readAsDataURL(input.files[0]);
+}
+
+function saveAbout(){
+  const d={name:document.getElementById('abt-name').value,tag:document.getElementById('abt-tag').value,bio:document.getElementById('abt-bio').value,sty:document.getElementById('abt-sty').value};
+  try{localStorage.setItem('cb_about',JSON.stringify(d))}catch(e){}
+  if(d.name)document.getElementById('logo-txt').innerHTML=d.name.split(' ')[0]+"'s <em>chalkboard</em>";
+  flash('abt-saved');
+}
+
+function saveContact(){
+  const d={ig:document.getElementById('c-ig').value,em:document.getElementById('c-em').value,tw:document.getElementById('c-tw').value,wb:document.getElementById('c-wb').value,bh:document.getElementById('c-bh').value,pi:document.getElementById('c-pi').value};
+  try{localStorage.setItem('cb_contact',JSON.stringify(d))}catch(e){}
+  flash('cnt-saved');
+}
+
+function flash(id){const el=document.getElementById(id);el.style.opacity='1';setTimeout(()=>el.style.opacity='0',2200);}
+
+function loadSaved(){
+  try{
+    const a=JSON.parse(localStorage.getItem('cb_about')||'null');
+    if(a){
+      ['name','tag','bio','sty'].forEach(k=>{const el=document.getElementById('abt-'+k);if(el&&a[k])el.value=a[k];});
+      if(a.name)document.getElementById('logo-txt').innerHTML=a.name.split(' ')[0]+"'s <em>chalkboard</em>";
+    }
+    const av=localStorage.getItem('cb_avatar');
+    if(av){const img=document.getElementById('av-img');img.src=av;img.style.display='block';document.getElementById('av-icon').style.display='none';}
+    const c=JSON.parse(localStorage.getItem('cb_contact')||'null');
+    if(c){['ig','em','tw','wb','bh','pi'].forEach(k=>{const el=document.getElementById('c-'+k);if(el&&c[k])el.value=c[k];});}
+  }catch(e){}
+}
+
+const dz=document.getElementById('dropzone');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.style.borderColor='var(--ch-yellow)'});
+dz.addEventListener('dragleave',()=>{dz.style.borderColor=''});
+dz.addEventListener('drop',e=>{e.preventDefault();dz.style.borderColor='';handleFiles(e.dataTransfer.files);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLb();closeEdit();}});
+
+loadSaved();render();
+</script>
